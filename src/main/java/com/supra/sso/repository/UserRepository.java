@@ -6,4 +6,8 @@ import com.supra.sso.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
+    
+    //List<UserFromDatabase> fetchUserAsDTO(@Param("username") String username);
+    
+   
 }

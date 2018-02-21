@@ -2,29 +2,37 @@ package com.supra.sso.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.core.GrantedAuthority;
-
 @Entity
 @Table(name = "role")
-public class Role implements GrantedAuthority{
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2691172201754915414L;
+public class Role{
+
 	private Long id;
     private String authority;
     private Set<User> users;
 
     
-    @Id
+    public Role() {
+		super();
+	}
+
+	public Role(Long id, String authority, Set<User> users) {
+		super();
+		this.id = id;
+		this.authority = authority;
+		this.users = users;
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
         return id;
@@ -34,7 +42,6 @@ public class Role implements GrantedAuthority{
         this.id = id;
     }
 
-    @Override
     @Column(name="name")
     public String getAuthority() {
     	return authority;
@@ -45,7 +52,7 @@ public class Role implements GrantedAuthority{
     }
 
 
-    @ManyToMany(mappedBy = "authorities")
+    @ManyToMany(mappedBy = "roles", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
     public Set<User> getUsers() {
         return users;
     }

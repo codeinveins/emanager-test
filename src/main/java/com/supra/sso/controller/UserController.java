@@ -1,16 +1,28 @@
 package com.supra.sso.controller;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.supra.sso.model.Role;
 import com.supra.sso.model.User;
+import com.supra.sso.model.UserForm;
+import com.supra.sso.repository.RoleRepository;
 import com.supra.sso.service.SecurityService;
 import com.supra.sso.service.UserService;
+import com.supra.sso.utiities.ApplicationConstants;
 import com.supra.sso.validators.UserValidator;
 
 @Controller
@@ -26,6 +38,8 @@ public class UserController {
     @Autowired
     private UserValidator userValidator;
 
+    @Autowired
+    private RoleRepository roleRepository;
     
     
     
@@ -33,6 +47,7 @@ public class UserController {
     //Welcome
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
     public String welcome(Model model) {
+    	model.addAttribute("user", (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return "welcome";
     }
 
@@ -56,7 +71,7 @@ public class UserController {
     //Registration
         @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public String registration(Model model) {
-        model.addAttribute("userForm", new User());
+        model.addAttribute("userForm", new UserForm());
         return "registration";
     }
 
@@ -64,15 +79,37 @@ public class UserController {
         
     
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
-    public String registration(@ModelAttribute("userForm") User userForm, BindingResult bindingResult, Model model) {
+    public String registration(@ModelAttribute("userForm") UserForm userForm, BindingResult bindingResult, Model model) {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
             return "registration";
         }
-        userService.save(userForm);
+        List<Role> roles = roleRepository.findAll();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        for (Role role : roles){
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
+        }
+        User user = new User(userForm.getUsername(), userForm.getPassword(), grantedAuthorities);
+        userService.save(user);
         securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());
         return "redirect:/welcome";
+    }
+    
+    @RequestMapping(value="/openPageFor/{moduleName}")
+    public String openPageForModule(@PathVariable("moduleName") String moduleName) {
+    	String viewName=null;
+    	if(moduleName.equals(ApplicationConstants.ATTENDANCE_MODULE)) {
+    		viewName = "attendanceWelcome";
+    	}
+    	else if(moduleName.equals(ApplicationConstants.TIMESHEET_MODULE)) {
+    		viewName = "timesheetWelcome";
+    	}
+    	else {
+    		viewName = "errorModuleWelcome";
+    	}
+    		
+    	return viewName;
     }
     
 }

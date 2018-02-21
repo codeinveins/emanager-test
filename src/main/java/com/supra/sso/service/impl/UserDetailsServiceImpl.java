@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.supra.sso.model.Modules;
 import com.supra.sso.model.Role;
 import com.supra.sso.model.User;
 import com.supra.sso.repository.UserRepository;
@@ -25,15 +26,32 @@ public class UserDetailsServiceImpl implements UserDetailsService{
     @Override
     //@Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-
-        /*Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        for (Role role : user.getRoles()){
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+    	
+    	User userFromDatabase = userRepository.findByUsername(username);
+    	
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        for (Role role : userFromDatabase.getRoles()){
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
         }
-        user.setAuthorities(grantedAuthorities);*/
+
+        Set<Modules> modules = new HashSet<>();
+        for(Modules module : userFromDatabase.getModules()) {
+        	modules.add(new Modules(module.getId(), module.getName(), module.getUsers()));
+        }
+        
+        Set<Role> roles = new HashSet<>();
+        for(Role role : userFromDatabase.getRoles()) {
+        	roles.add(new Role(role.getId(), role.getAuthority(), role.getUsers()));
+        }
+        
+        User userToReturn = new User(userFromDatabase.getUsername(), userFromDatabase.getPassword(), 
+        							userFromDatabase.isEnabled(), userFromDatabase.isAccountNonExpired(), 
+        							userFromDatabase.isAccountNonExpired(), userFromDatabase.isAccountNonLocked(), 
+        							grantedAuthorities, modules, roles);
+        return userToReturn;
+        
+        
+        //User userToReturn = new User(username, userFromDatabase.getPassword(), true, true, true, true, grantedAuthorities, userFromDatabase.getModules());
         //return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
-//        System.out.println(user.getAuthorities());
-        return user;
     }
 }

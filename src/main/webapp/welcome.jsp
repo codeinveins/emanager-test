@@ -1,5 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -30,8 +31,19 @@
         <form id="logoutForm" method="POST" action="${contextPath}/logout">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
-
-        <h2>Welcome ${pageContext.request.userPrincipal} | <a onclick="document.forms['logoutForm'].submit()">Logout</a></h2>
+		<!-- ${pageContext.request.userPrincipal} -->
+        <h2>Welcome <sec:authentication property="principal.username" /> | <a onclick="document.forms['logoutForm'].submit()">Logout</a></h2>
+		<br/>
+		<h3>Below is the list of modules you are authorized for:</h3><br/>
+		<hr/>
+		<table style="border-color: black; border-width: 2px; border-style: dashed; width: 100%; text-align: center; height: 5em;">
+		<tr>
+		<c:forEach items="${user.modules}" var="module">
+			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="openPageFor/${module.name}"> ${module.name} </a></td>
+		</c:forEach>
+		</tr>
+		</table>		   
+		     
 		
     </c:if>
 

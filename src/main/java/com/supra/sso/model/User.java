@@ -1,9 +1,10 @@
  package com.supra.sso.model;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,37 +14,50 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
 
 
 @Entity
 @Table(name = "user")
-public class User implements UserDetails{
+public class User extends org.springframework.security.core.userdetails.User {
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 5698598250645942130L;
 	private Long id;
-    private String username;
-    private String password;
-    private String passwordConfirm;
-    private Set<Role> authorities;
+    //private String passwordConfirm;
+    private String username = super.getUsername();
+	private String password = super.getPassword();
+    private Set<Role> roles;
     private Set<Modules> modules;
     
-    //private Set<GrantedAuthority> authorities;
-	private boolean accountNonExpired;
-	private boolean accountNonLocked;
-	private boolean credentialsNonExpired;
-	private boolean enabled;
-	
-    
-    
+    public User() {
+    	this("dummy username", "dummy password", new HashSet<>());
+    }
 
+	public User(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+		super(username, password, authorities);
+	}
+
+	public User(String username, String password, boolean enabled,
+            boolean accountNonExpired, boolean credentialsNonExpired,
+            boolean accountNonLocked,
+            Collection<? extends GrantedAuthority> authorities, 
+            Set<Modules> modules, Set<Role> roles) {
+		
+    	super(username, password, enabled, accountNonExpired,
+                credentialsNonExpired, accountNonLocked, authorities);
+		
+    	this.modules = modules;
+    	this.roles = roles;
+	}
+
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+    
+    
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
@@ -62,13 +76,16 @@ public class User implements UserDetails{
         this.username = username;
     }
 
+    
     public String getPassword() {
-        return password;
+    	return password;
+    }
+    
+    public void setPassword(String password) {
+    	this.password = password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    /* 
 
     @Transient
     public String getPasswordConfirm() {
@@ -77,15 +94,6 @@ public class User implements UserDetails{
 
     public void setPasswordConfirm(String passwordConfirm) {
         this.passwordConfirm = passwordConfirm;
-    }
-
-/*    @Transient
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
     }*/
 
     @ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
@@ -94,63 +102,19 @@ public class User implements UserDetails{
 		return modules;
 	}
 
-	public void setModules(Set<Modules> modules) {
-		this.modules = modules;
-	}
-    
-	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+    public void setModules(Set<Modules> modules) {
+    	this.modules = modules;
+    }
+	
+    @ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinTable(name = "user_role_mapping", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    public Set<Role> getAuthorities() {
-		return authorities;
+   
+	public Set<Role> getRoles() {
+		return roles;
 	}
 
-	public void setAuthorities(Set<Role> authorities) {
-		this.authorities = authorities;
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
-
-	@Column(columnDefinition="smallint default 1")
-	public boolean isAccountNonExpired() {
-		return accountNonExpired;
-	}
-
-	public void setAccountNonExpired(boolean accountNonExpired) {
-		this.accountNonExpired = accountNonExpired;
-	}
-	
-	@Column(columnDefinition="smallint default 1")
-	public boolean isAccountNonLocked() {
-		return accountNonLocked;
-	}
-
-	public void setAccountNonLocked(boolean accountNonLocked) {
-		this.accountNonLocked = accountNonLocked;
-	}
-
-	@Column(columnDefinition="smallint default 1")
-	public boolean isCredentialsNonExpired() {
-		return credentialsNonExpired;
-	}
-
-	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-		this.credentialsNonExpired = credentialsNonExpired;
-	}
-
-	@Column(columnDefinition="smallint default 1")
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", password=" + "PROTECTED" + ", authorities=" + authorities
-				+ ", modules=" + modules + ", accountNonExpired=" + accountNonExpired + ", accountNonLocked="
-				+ accountNonLocked + ", credentialsNonExpired=" + credentialsNonExpired + ", enabled=" + enabled + "]";
-	}
-	
-	
  
 }

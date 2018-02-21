@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.supra.sso.model.User;
+import com.supra.sso.repository.ModuleRepository;
 import com.supra.sso.repository.RoleRepository;
 import com.supra.sso.repository.UserRepository;
 import com.supra.sso.service.UserService;
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     
     
@@ -29,7 +33,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setAuthorities(new HashSet<>(roleRepository.findAll()));
+        user.setRoles(new HashSet<>(roleRepository.findAll()));
+        user.setModules(new HashSet<>(moduleRepository.findAll()));
         userRepository.save(user);
     }
 

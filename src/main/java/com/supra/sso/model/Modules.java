@@ -2,7 +2,9 @@ package com.supra.sso.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,8 +18,21 @@ public class Modules {
 	private Long id;
     private String name;
     private Set<User> users;
+    
+    
 
-    @Id
+    public Modules() {
+		super();
+	}
+
+	public Modules(Long id, String name, Set<User> users) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.users = users;
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
         return id;
@@ -35,7 +50,7 @@ public class Modules {
         this.name = name;
     }
 
-    @ManyToMany(mappedBy = "modules")
+    @ManyToMany(mappedBy = "modules", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
     public Set<User> getUsers() {
         return users;
     }
