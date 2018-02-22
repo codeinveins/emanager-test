@@ -48,7 +48,7 @@
 			<c:if test="${module.name eq 'attendance'}">
 				<c:set var="port" value="8082" scope="session" />
 			</c:if>
-			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="http://localhost:${port}/${module.name}/welcome${module.name}/"> ${module.name} </a></td>
+			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="http://localhost:${port}/${module.name}/welcome${module.name}?username=${pageContext.request.userPrincipal.name}&role=<sec:authentication property="principal.authorities" />"> ${module.name} </a></td>
 		</c:forEach>
 		</tr>
 		</table>		   
