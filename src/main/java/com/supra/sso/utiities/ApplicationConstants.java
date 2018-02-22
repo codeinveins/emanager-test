@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationConstants {
 
-	public static String ATTENDANCE_MODULE = "ATTENDANCE";
-	public static String TIMESHEET_MODULE = "TIMESHEET";
+	public static String ATTENDANCE_MODULE = "attendance";
+	public static String TIMESHEET_MODULE = "timesheet";
 	
 	public static String ROLE_HR = "ROLE_ADMIN";
 	

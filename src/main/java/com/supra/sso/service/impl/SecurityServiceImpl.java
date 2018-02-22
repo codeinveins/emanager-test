@@ -10,7 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import com.supra.sso.model.UserToken;
+import com.supra.sso.repository.UserTokenRepository;
 import com.supra.sso.service.SecurityService;
+import com.supra.sso.utiities.ApplicationUtilities;
 
 @Service
 public class SecurityServiceImpl implements SecurityService{
@@ -20,14 +23,17 @@ public class SecurityServiceImpl implements SecurityService{
 
     @Autowired
     private UserDetailsService userDetailsService;
+    
+    @Autowired
+    UserTokenRepository userTokenRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityServiceImpl.class);
 
     @Override
-    public String findLoggedInUsername() {
+    public UserDetails findLoggedInUser() {
         Object userDetails = SecurityContextHolder.getContext().getAuthentication().getDetails();
         if (userDetails instanceof UserDetails) {
-            return ((UserDetails)userDetails).getUsername();
+            return ((UserDetails)userDetails);
         }
 
         return null;
@@ -40,10 +46,19 @@ public class SecurityServiceImpl implements SecurityService{
         		(userDetails, password, userDetails.getAuthorities());
 
         authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
+        
         if (usernamePasswordAuthenticationToken.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             logger.debug(String.format("Auto login %s successfully!", username));
         }
+        
+        generateAccessToken(userDetails);
+    }
+    
+    @Override
+    public UserToken generateAccessToken(UserDetails loggedInUser) {
+    	UserToken userToken = ApplicationUtilities.generateTokenAtLogin(loggedInUser);
+		userTokenRepository.save(userToken);
+		return userToken;
     }
 }

@@ -38,8 +38,17 @@
 		<hr/>
 		<table style="border-color: black; border-width: 2px; border-style: dashed; width: 100%; text-align: center; height: 5em;">
 		<tr>
+		
+		
 		<c:forEach items="${user.modules}" var="module">
-			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="openPageFor/${module.name}"> ${module.name} </a></td>
+		
+			<c:if test="${module.name eq 'timesheet'}">
+				<c:set var="port" value="8081" scope="session" />
+			</c:if>
+			<c:if test="${module.name eq 'attendance'}">
+				<c:set var="port" value="8082" scope="session" />
+			</c:if>
+			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="http://localhost:${port}/${module.name}/welcome${module.name}/"> ${module.name} </a></td>
 		</c:forEach>
 		</tr>
 		</table>		   

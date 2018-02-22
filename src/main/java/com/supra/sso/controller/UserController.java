@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.supra.sso.model.Role;
 import com.supra.sso.model.User;
 import com.supra.sso.model.UserForm;
+import com.supra.sso.model.UserToken;
 import com.supra.sso.repository.RoleRepository;
 import com.supra.sso.service.SecurityService;
 import com.supra.sso.service.UserService;
@@ -27,7 +30,6 @@ import com.supra.sso.validators.UserValidator;
 
 @Controller
 public class UserController {
-   
 	
 	@Autowired
     private UserService userService;
@@ -41,21 +43,21 @@ public class UserController {
     @Autowired
     private RoleRepository roleRepository;
     
-    
-    
-
     //Welcome
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-    public String welcome(Model model) {
-    	model.addAttribute("user", (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        return "welcome";
+    public String welcome(Model model, HttpSession httpSession) {
+    	User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	if(null != loggedInUser) {
+    		model.addAttribute("user", loggedInUser);
+    		return "welcome";
+    	}
+    	else {
+    		return "redirect:/logout";    		
+    	}
     }
 
-
     
-    
-    
-  //Login
+    //Login
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(Model model, String error, String logout) {
         if (error != null)
@@ -66,17 +68,13 @@ public class UserController {
     }
 
     
-    
-    
     //Registration
-        @RequestMapping(value = "/registration", method = RequestMethod.GET)
+    @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public String registration(Model model) {
         model.addAttribute("userForm", new UserForm());
         return "registration";
     }
 
-    
-        
     
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public String registration(@ModelAttribute("userForm") UserForm userForm, BindingResult bindingResult, Model model) {
@@ -96,11 +94,12 @@ public class UserController {
         return "redirect:/welcome";
     }
     
+
     @RequestMapping(value="/openPageFor/{moduleName}")
     public String openPageForModule(@PathVariable("moduleName") String moduleName) {
     	String viewName=null;
     	if(moduleName.equals(ApplicationConstants.ATTENDANCE_MODULE)) {
-    		viewName = "attendanceWelcome";
+    		viewName = "http://localhost:8081/timesheet/welcometimesheet";
     	}
     	else if(moduleName.equals(ApplicationConstants.TIMESHEET_MODULE)) {
     		viewName = "timesheetWelcome";
@@ -109,8 +108,7 @@ public class UserController {
     		viewName = "errorModuleWelcome";
     	}
     		
-    	return viewName;
+    	return "redirect://"+viewName;
     }
     
 }
-
