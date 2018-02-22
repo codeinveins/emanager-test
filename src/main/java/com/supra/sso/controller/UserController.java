@@ -55,7 +55,7 @@ public class UserController {
     		return "redirect:/logout";    		
     	}
     }
-
+//...
     
     //Login
     @RequestMapping(value = "/login", method = RequestMethod.GET)
