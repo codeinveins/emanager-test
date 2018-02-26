@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.supra.sso.utiities.CustomAuthenticationSuccessHandler;
 
@@ -31,17 +30,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
+                http.authorizeRequests()
                     .antMatchers("/resources/**", "/registration").permitAll()
                     .anyRequest().authenticated()
                     .and()
-                .formLogin()
+                    
+                    .formLogin()
                     .loginPage("/login")
                     .successHandler(customAuthenticationSuccessHandler())
                     .permitAll()
+                    
                     .and()
-                .logout()
+                    .logout()
                     .permitAll();
     }
 

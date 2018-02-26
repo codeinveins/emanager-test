@@ -55,7 +55,6 @@ public class UserController {
     		return "redirect:/logout";    		
     	}
     }
-//...
     
     //Login
     @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -74,12 +73,12 @@ public class UserController {
         model.addAttribute("userForm", new UserForm());
         return "registration";
     }
-
+    
+    
     
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public String registration(@ModelAttribute("userForm") UserForm userForm, BindingResult bindingResult, Model model) {
         userValidator.validate(userForm, bindingResult);
-
         if (bindingResult.hasErrors()) {
             return "registration";
         }
@@ -93,8 +92,8 @@ public class UserController {
         securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());
         return "redirect:/welcome";
     }
+   
     
-
     @RequestMapping(value="/openPageFor/{moduleName}")
     public String openPageForModule(@PathVariable("moduleName") String moduleName) {
     	String viewName=null;
@@ -107,8 +106,6 @@ public class UserController {
     	else {
     		viewName = "errorModuleWelcome";
     	}
-    		
-    	return "redirect://"+viewName;
+    return "redirect://"+viewName;
     }
-    
-}
+    }

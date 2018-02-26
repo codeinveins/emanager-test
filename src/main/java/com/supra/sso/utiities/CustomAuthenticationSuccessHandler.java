@@ -24,6 +24,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	public void onAuthenticationSuccess(HttpServletRequest req, HttpServletResponse res, Authentication auth)
 			throws IOException, ServletException {
 
+		
 		UserToken token = securityService.generateAccessToken((User)auth.getPrincipal());
 		req.getSession().setAttribute("token", token.getToken());
 		res.sendRedirect("welcome");
