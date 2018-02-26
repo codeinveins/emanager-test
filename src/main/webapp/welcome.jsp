@@ -32,7 +32,7 @@
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
 		<!-- ${pageContext.request.userPrincipal} -->
-        <h2>Welcome <sec:authentication property="principal.username" /> | <a onclick="document.forms['logoutForm'].submit()">Logout</a></h2>
+        <h2>Welcome <sec:authentication property="principal.username" /> | <a href="http://localhost:8080/sso/logout">Logout</a><!-- <a onclick="document.forms['logoutForm'].submit()">Logout</a> --></h2>
 		<br/>
 		<h3>Below is the list of modules you are authorized for:</h3><br/>
 		<hr/>
@@ -50,14 +50,8 @@
 				<c:set var="port" value="8082" scope="session" />  <!-- page,request,Global session -->
 			</c:if>
 			<c:url value="http://localhost:${port}/${module.name}/welcome${module.name}" var="url" />
-			<form action="${url}">
-			<%
-				response.setHeader("token", session.getAttribute("token").toString());
-				response.sendRedirect("${url}");
-			%>
-			<td><button  value="${module.name}" type="submit"></button></td>
-			</form>
-<%-- 			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="http://localhost:${port}/${module.name}/welcome${module.name}?token=<%= session.getAttribute("token") %>&username=${pageContext.request.userPrincipal.name}&role=<sec:authentication property="principal.authorities" />"> ${module.name} </a></td> --%>
+			<td style="border-color: black; border-width: 2px; border-style: dashed;"><a href="http://localhost:${port}/${module.name}/welcome${module.name}?token=<%= session.getAttribute("token") %>"> ${module.name} </a></td>
+			<!-- &username=${pageContext.request.userPrincipal.name}&role=<sec:authentication property="principal.authorities" /> -->
 		</c:forEach>
 		</tr>
 		</table>		   

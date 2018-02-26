@@ -9,8 +9,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.supra.sso.utiities.CustomAuthenticationSuccessHandler;
+import com.supra.sso.utiities.CustomLogoutHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +29,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
     	return new CustomAuthenticationSuccessHandler();
     }
+    
+    @Bean
+    public CustomLogoutHandler customLogoutHandler() {
+    	return new CustomLogoutHandler();
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -42,7 +49,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     
                     .and()
                     .logout()
-                    .permitAll();
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                    .addLogoutHandler(customLogoutHandler())
+                    .logoutSuccessUrl("/login")
+                    .permitAll()
+                    
+                    .and()
+                    .csrf().disable();
     }
 
     @Autowired

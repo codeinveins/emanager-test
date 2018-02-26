@@ -30,82 +30,67 @@ import com.supra.sso.validators.UserValidator;
 
 @Controller
 public class UserController {
-	
+
 	@Autowired
-    private UserService userService;
+	private UserService userService;
 
-    @Autowired
-    private SecurityService securityService;
+	@Autowired
+	private SecurityService securityService;
 
-    @Autowired
-    private UserValidator userValidator;
+	@Autowired
+	private UserValidator userValidator;
 
-    @Autowired
-    private RoleRepository roleRepository;
-    
-    //Welcome
-    @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-    public String welcome(Model model, HttpSession httpSession) {
-    	User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	if(null != loggedInUser) {
-    		model.addAttribute("user", loggedInUser);
-    		return "welcome";
-    	}
-    	else {
-    		return "redirect:/logout";    		
-    	}
-    }
-    
-    //Login
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("error", "Your username and password is invalid.");
-        if (logout != null)
-            model.addAttribute("message", "You have been logged out successfully.");
-        return "login";
-    }
+	@Autowired
+	private RoleRepository roleRepository;
 
-    
-    //Registration
-    @RequestMapping(value = "/registration", method = RequestMethod.GET)
-    public String registration(Model model) {
-        model.addAttribute("userForm", new UserForm());
-        return "registration";
-    }
-    
-    
-    
-    @RequestMapping(value = "/registration", method = RequestMethod.POST)
-    public String registration(@ModelAttribute("userForm") UserForm userForm, BindingResult bindingResult, Model model) {
-        userValidator.validate(userForm, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return "registration";
-        }
-        List<Role> roles = roleRepository.findAll();
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        for (Role role : roles){
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
-        }
-        User user = new User(userForm.getUsername(), userForm.getPassword(), grantedAuthorities);
-        userService.save(user);
-        securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());
-        return "redirect:/welcome";
-    }
-   
-    
-    @RequestMapping(value="/openPageFor/{moduleName}")
-    public String openPageForModule(@PathVariable("moduleName") String moduleName) {
-    	String viewName=null;
-    	if(moduleName.equals(ApplicationConstants.ATTENDANCE_MODULE)) {
-    		viewName = "http://localhost:8081/timesheet/welcometimesheet";
-    	}
-    	else if(moduleName.equals(ApplicationConstants.TIMESHEET_MODULE)) {
-    		viewName = "timesheetWelcome";
-    	}
-    	else {
-    		viewName = "errorModuleWelcome";
-    	}
-    return "redirect://"+viewName;
-    }
-    }
+	//Welcome
+	@RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
+	public String welcome(Model model, HttpSession httpSession) {
+		User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if(null != loggedInUser) {
+			model.addAttribute("user", loggedInUser);
+			return "welcome";
+		}
+		else {
+			return "redirect:/logout";    		
+		}
+	}
+
+	//Login
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	public String login(Model model, String error, String logout) {
+		if (error != null)
+			model.addAttribute("error", "Your username and password is invalid.");
+		if (logout != null)
+			model.addAttribute("message", "You have been logged out successfully.");
+		return "login";
+	}
+
+
+	//Registration
+	@RequestMapping(value = "/registration", method = RequestMethod.GET)
+	public String registration(Model model) {
+		model.addAttribute("userForm", new UserForm());
+		return "registration";
+	}
+
+
+
+	@RequestMapping(value = "/registration", method = RequestMethod.POST)
+	public String registration(@ModelAttribute("userForm") UserForm userForm, BindingResult bindingResult, Model model) {
+		userValidator.validate(userForm, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "registration";
+		}
+		List<Role> roles = roleRepository.findAll();
+		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+		for (Role role : roles){
+			grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
+		}
+		User user = new User(userForm.getUsername(), userForm.getPassword(), grantedAuthorities);
+		userService.save(user);
+		securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());
+		return "redirect:/welcome";
+	}
+
+}
