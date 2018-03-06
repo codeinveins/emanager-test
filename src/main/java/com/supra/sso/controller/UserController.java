@@ -1,9 +1,12 @@
 package com.supra.sso.controller;
 
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +17,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.supra.sso.model.Role;
 import com.supra.sso.model.User;
 import com.supra.sso.model.UserForm;
-import com.supra.sso.model.UserToken;
 import com.supra.sso.repository.RoleRepository;
 import com.supra.sso.service.SecurityService;
 import com.supra.sso.service.UserService;
-import com.supra.sso.utiities.ApplicationConstants;
 import com.supra.sso.validators.UserValidator;
 
 @Controller
@@ -45,7 +46,11 @@ public class UserController {
 
 	//Welcome
 	@RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-	public String welcome(Model model, HttpSession httpSession) {
+	public String welcome(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession httpSession) {
+		Enumeration<String> params = request.getParameterNames();
+		while (params.hasMoreElements()) {
+			String paramName = (String) params.nextElement();
+		}
 		User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if(null != loggedInUser) {
 			model.addAttribute("user", loggedInUser);
@@ -58,14 +63,23 @@ public class UserController {
 
 	//Login
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(Model model, String error, String logout) {
+	public String login(
+			@RequestParam(name="module") String moduleName,
+			Model model, String error, String logout) {
 		if (error != null)
 			model.addAttribute("error", "Your username and password is invalid.");
 		if (logout != null)
 			model.addAttribute("message", "You have been logged out successfully.");
+		
 		return "login";
 	}
 
+	@RequestMapping(value = "/login2", method = RequestMethod.GET)
+	public String login2(
+			@RequestParam(name="module") String moduleName, Model model) {
+		System.out.println(moduleName);
+		return "redirect://login?module="+moduleName;
+	}
 
 	//Registration
 	@RequestMapping(value = "/registration", method = RequestMethod.GET)
