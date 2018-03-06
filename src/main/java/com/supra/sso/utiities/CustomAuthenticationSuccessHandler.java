@@ -1,6 +1,7 @@
 package com.supra.sso.utiities;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +22,22 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	SecurityServiceImpl securityService;
 	
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest req, HttpServletResponse res, Authentication auth)
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
 			throws IOException, ServletException {
 
 		
 		UserToken token = securityService.generateAccessToken((User)auth.getPrincipal());
-		req.getSession().setAttribute("token", token.getToken());
-		res.sendRedirect("welcome");
+		request.getSession().setAttribute("token", token.getToken());
+		
+		Enumeration<String> params = request.getParameterNames();
+		String module = null;
+		while (params.hasMoreElements()) {
+			String paramName = (String) params.nextElement();
+			if(paramName.equals("module"))
+				module = request.getParameter(paramName); 
+		}
+		
+		response.sendRedirect("welcome?module="+module);
 	}
 
 }

@@ -1,11 +1,9 @@
 package com.supra.sso.controller;
 
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.supra.sso.model.Role;
 import com.supra.sso.model.User;
@@ -27,6 +26,7 @@ import com.supra.sso.model.UserForm;
 import com.supra.sso.repository.RoleRepository;
 import com.supra.sso.service.SecurityService;
 import com.supra.sso.service.UserService;
+import com.supra.sso.utiities.ApplicationConstants;
 import com.supra.sso.validators.UserValidator;
 
 @Controller
@@ -46,39 +46,44 @@ public class UserController {
 
 	//Welcome
 	@RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-	public String welcome(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession httpSession) {
-		Enumeration<String> params = request.getParameterNames();
-		while (params.hasMoreElements()) {
-			String paramName = (String) params.nextElement();
+	public ModelAndView welcome(Model model, @RequestParam(name="module", defaultValue="sso") String moduleName,
+			HttpServletResponse response,
+			HttpSession httpSession) {
+		ModelAndView modelAndView = new ModelAndView();
+		if(moduleName.equals(ApplicationConstants.ATTENDANCE_MODULE)) {
+			return new ModelAndView("redirect:http://localhost:8082/"+moduleName+"/welcome"+moduleName+"?token="+httpSession.getAttribute("token"));
 		}
-		User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if(null != loggedInUser) {
-			model.addAttribute("user", loggedInUser);
-			return "welcome";
+		else if(moduleName.equals(ApplicationConstants.TIMESHEET_MODULE)) {
+			return new ModelAndView("redirect:http://localhost:8081/"+moduleName+"/welcome"+moduleName+"?token="+httpSession.getAttribute("token"));
 		}
 		else {
-			return "redirect:/logout";    		
+			User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if(null != loggedInUser) {
+				modelAndView.addObject("user", loggedInUser);
+				modelAndView.setViewName("welcome");
+				return modelAndView;
+			}
+			else {
+				return new ModelAndView("redirect:/logout");    		
+			}
 		}
 	}
 
 	//Login
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(
-			@RequestParam(name="module") String moduleName,
+	public ModelAndView login(
+			@RequestParam(name="module", defaultValue="sso") String moduleName,
 			Model model, String error, String logout) {
+		
+		ModelAndView modelAndView = new ModelAndView();
 		if (error != null)
 			model.addAttribute("error", "Your username and password is invalid.");
 		if (logout != null)
 			model.addAttribute("message", "You have been logged out successfully.");
 		
-		return "login";
-	}
-
-	@RequestMapping(value = "/login2", method = RequestMethod.GET)
-	public String login2(
-			@RequestParam(name="module") String moduleName, Model model) {
-		System.out.println(moduleName);
-		return "redirect://login?module="+moduleName;
+		modelAndView.setViewName("login");
+		modelAndView.addObject("moduleName", moduleName);
+		return modelAndView;
 	}
 
 	//Registration

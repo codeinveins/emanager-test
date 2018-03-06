@@ -32,7 +32,7 @@
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
 		<!-- ${pageContext.request.userPrincipal} -->
-        <h2>Welcome <sec:authentication property="principal.username" /> | <a href="http://localhost:8080/sso/logout">Logout</a><!-- <a onclick="document.forms['logoutForm'].submit()">Logout</a> --></h2>
+        <h2>Welcome <sec:authentication property="principal.username" /> | <a href="http://localhost:8080/sso/logout?token=<%= session.getAttribute("token") %>">Logout</a><!-- <a onclick="document.forms['logoutForm'].submit()">Logout</a> --></h2>
 		<br/>
 		<h3>Below is the list of modules you are authorized for:</h3><br/>
 		<hr/>

@@ -33,13 +33,14 @@ public class CustomLogoutHandler implements LogoutHandler{
 				
 				//delete token
 				userTokenRepository.delete(userToken.getId());
-				request.getSession().invalidate();
-				try {
-					response.sendRedirect("login?logout");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
+		}
+		authentication = null;
+		request.getSession().invalidate();
+		try {
+			response.sendRedirect("login?logout");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
