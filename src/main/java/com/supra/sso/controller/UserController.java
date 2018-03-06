@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.supra.sso.model.Role;
@@ -112,4 +113,9 @@ public class UserController {
 		return "redirect:/welcome";
 	}
 
+    @RequestMapping(value="autologinsso")
+    @ResponseBody
+    public void autoLogin(@RequestParam("username") String username, @RequestParam("password") String password) {
+    	securityService.autologin(password, password);
+    }
 }
