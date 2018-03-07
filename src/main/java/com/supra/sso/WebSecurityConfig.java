@@ -14,6 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.supra.sso.utiities.CustomAuthenticationEntryPoint;
 import com.supra.sso.utiities.CustomAuthenticationSuccessHandler;
 import com.supra.sso.utiities.CustomLogoutHandler;
+import com.supra.sso.utiities.CustomUsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CustomLogoutHandler customLogoutHandler() {
     	return new CustomLogoutHandler();
     }
+    
+    @Bean
+    public CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter() {
+    	return new CustomUsernamePasswordAuthenticationFilter();
+    }
 
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
                 http
@@ -53,8 +60,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //.loginPage("/login")
                     .successHandler(customAuthenticationSuccessHandler())
                     .permitAll()
-                    
                     .and()
+
+                    //.addFilterAt(customUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                	
                     .logout()
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                     .addLogoutHandler(customLogoutHandler())

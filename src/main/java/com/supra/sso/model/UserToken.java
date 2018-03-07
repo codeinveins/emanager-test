@@ -20,6 +20,7 @@ public class UserToken {
 	private Date generationDate;
 	private Date expiryDate;
 	private String username;
+	private String ipAddress;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -60,5 +61,14 @@ public class UserToken {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+	
+	
 	
 }

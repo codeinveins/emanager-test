@@ -1,5 +1,7 @@
 package com.supra.sso.utiities;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -17,6 +19,12 @@ public class ApplicationUtilities {
 		userToken.setUsername(user.getUsername());
 		userToken.setGenerationDate(new Date());
 		userToken.setExpiryDate(new Date(System.currentTimeMillis()+(5*60*1000)));
+		try {
+			userToken.setIpAddress(InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return userToken;
 	}
 }

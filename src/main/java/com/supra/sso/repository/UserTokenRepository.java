@@ -7,4 +7,6 @@ import com.supra.sso.model.UserToken;
 public interface UserTokenRepository extends JpaRepository<UserToken, Long> {
 
 	UserToken findByToken(String token);
+	
+	UserToken findByIpAddress(String ipAddress);
 }
